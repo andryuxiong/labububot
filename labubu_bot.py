@@ -51,6 +51,19 @@ def human_like_delay():
     """Add a random delay to simulate human behavior."""
     time.sleep(random.uniform(0.5, 1.5))
 
+def get_chrome_profile_dir():
+    """Return the default Chrome profile path for the current OS."""
+    home = os.path.expanduser("~")
+    system = platform.system()
+
+    if system == "Darwin":
+        return os.path.join(home, "Library/Application Support/Google/Chrome/Default")
+    if system == "Windows":
+        local_app_data = os.getenv("LOCALAPPDATA")
+        if local_app_data:
+            return os.path.join(local_app_data, "Google", "Chrome", "User Data", "Default")
+    return os.path.join(home, ".config", "google-chrome", "Default")
+
 def play_sound_alert():
     """Play a sound alert when an item is added to cart."""
     try:
@@ -90,8 +103,7 @@ def get_driver():
         chrome_options = Options()
         
         # Get the user's Chrome profile directory
-        home = os.path.expanduser("~")
-        chrome_profile = os.path.join(home, "Library/Application Support/Google/Chrome/Default")
+        chrome_profile = get_chrome_profile_dir()
         
         # Create a temporary directory for the profile copy
         temp_dir = tempfile.mkdtemp()
@@ -123,7 +135,6 @@ def get_driver():
         chrome_options.add_argument("--disable-plugins-discovery")
         chrome_options.add_argument("--disable-plugins")
         chrome_options.add_argument("--disable-images")  # Disable images for faster loading
-        chrome_options.add_argument("--disable-javascript")  # Disable JavaScript for faster loading
         chrome_options.add_argument("--blink-settings=imagesEnabled=false")
         chrome_options.add_argument("--disk-cache-size=1")  # Minimize disk cache
         chrome_options.add_argument("--media-cache-size=1")  # Minimize media cache
